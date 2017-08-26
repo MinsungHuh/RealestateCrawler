@@ -1,5 +1,6 @@
 import sqlite3
 import requests
+import urllib.parse
 
 conn = sqlite3.connect("certified_realestate.db")
 
@@ -16,7 +17,12 @@ def translate_addr_to_geo():
         name = row[1]
         address = row[2]
 
-    url = "https://dapi.kakao.com/v2/local/search/address.json&query=%s"
-    headers = {'Authorization': 'KakaoAK eea2d2fd1428b73cd2fe292d7bb962a5'}
+        url = "https://dapi.kakao.com/v2/local/search/address.json?query=%s" % address
+        headers = {'Authorization': 'KakaoAK eea2d2fd1428b73cd2fe292d7bb962a5'}
+        response = requests.get(url, headers=headers).json()
+        print(response)
 
-    requests.get(url, headers)
+        break
+
+
+translate_addr_to_geo()
