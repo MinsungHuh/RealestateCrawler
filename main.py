@@ -145,4 +145,4 @@ def insert_realestate_data(item):
 
     print('name: ' + name + " inserted")
 
-search_realestate()
+# search_realestate()

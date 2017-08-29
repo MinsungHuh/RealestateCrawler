@@ -7,7 +7,8 @@ conn = sqlite3.connect("certified_realestate.db")
 
 
 def get_realestate():
-    query = "SELECT id, name, address FROM certified_realestate WHERE zip_code is NULL ORDER BY id"
+    query = "SELECT id, name, address FROM certified_realestate" \
+            " WHERE lat is NULL ORDER BY id"
     cursor = conn.cursor()
     return cursor.execute(query).fetchall()
 
@@ -37,9 +38,14 @@ def translate_addr_to_geo():
 
         url = "https://dapi.kakao.com/v2/local/search/address.json?query=%s" % address
         print('url', url)
-        headers = {'Authorization': 'KakaoAK eea2d2fd1428b73cd2fe292d7bb962a5'}
-        response = requests.get(url, headers=headers).json()
+        headers = {'Authorization': 'KakaoAK {INPUT_YOUR_KEY}'}
+        response = requests.get(url, headers=headers)
 
+        if response.status_code != 200:
+            print('status_code error')
+            continue
+
+        response = response.json()
         if response['meta']['total_count'] <= 0:
             print('not converted.')
             continue
@@ -74,11 +80,21 @@ def translate_addr_to_geo_by_naver():
         enc_address = urllib.parse.quote(row[2])
         url = "https://openapi.naver.com/v1/map/geocode?query=%s" % enc_address
         header = {
-            'X-Naver-Client-Id': 'Tehtk3IJTxiFGeHIek8e',
-            'X-Naver-Client-Secret': 'Vk1RXAGEqL'
+            'X-Naver-Client-Id': 'YOUR_CLIENT_ID',
+            'X-Naver-Client-Secret': 'YOUR_CLIENT_SECRET'
         }
 
-        response = requests.get(url, headers=header).json()
+        response = requests.get(url, headers=header)
+        print(response)
+        if response.status_code != 200:
+            print('status_code error')
+            continue
+
+        response.json()
+        if 'errorCode' in response:
+            print('errorMessage: ' + response['errorMessage'])
+            continue
+
         if response['result']['total'] <= 0:
             print('not converted.')
             continue
@@ -96,4 +112,4 @@ def translate_addr_to_geo_by_naver():
         update_address(data)
 
 
-translate_addr_to_geo()
+translate_addr_to_geo_by_naver()
